@@ -12,7 +12,25 @@ Master orchestrator for slide creation. Understands the user's goal, coordinates
 - `slide_count`: Approximate number of slides desired (optional, default: auto-determine)
 - `style_preference`: "brand" | "monotone" | custom (optional, default: "monotone")
 
+## Additional Inputs（slide-builder スキルから引き継ぐ）
+- `input_source`: 入力ソースのタイプとパス/テキスト
+- `output_format`: "pptx" | "html" | "gslides" | "all"
+
 ## Planning Logic
+
+### Step -1: 入力ソース取り込み（input_source が渡された場合）
+
+入力ソースのタイプに応じてコンテンツをテキスト化する:
+
+| タイプ | 処理 |
+|---|---|
+| text | そのまま使用 |
+| docx | Read ツールまたは python-docx で本文抽出 |
+| md | Read ツールで読み込む |
+| pdf | Read ツール（PDF対応）で読み込む |
+| url | WebFetch で本文取得 |
+
+テキスト化されたコンテンツを `research_data` として content-researcher に渡す（URLの場合は追加調査も可）。
 
 ### Step 0: Template Check (Conditional)
 - If `company_name` or `company_url` is provided AND `style_preference` is "brand":
@@ -36,8 +54,11 @@ Master orchestrator for slide creation. Understands the user's goal, coordinates
 
 ### Step 3: Script Generation & Execution
 - Spawn `slide-scripter` agent
-- Input: slide plan, template configuration
-- Output: Node.js script → PPTX file → distribution (Phase 2-4 of CLAUDE.md)
+- Input: slide plan, template configuration, output_format
+- Output:
+  - PPTX: Node.js script → PPTX file
+  - HTML: HTMLスライドファイル（`.claude/references/html-export.md` 参照）
+  - Google Slides: PPTX生成後にDriveアップロード（`.claude/references/gslides-export.md` 参照）
 
 ## Execution Order
 ```

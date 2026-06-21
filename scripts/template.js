@@ -1459,6 +1459,673 @@ function addMatrixTableSlide(pres, title, keyMessage, mtData, source) {
 }
 
 // =============================================================================
+// パターン 23: ハブ＆スポーク
+// =============================================================================
+
+function addHubSpokeSlide(pres, title, keyMessage, data, source) {
+  // data: { hub: "中心テキスト", spokes: [{ label: "...", description: "..." }] }
+  var slide = pres.addSlide();
+  addSlideTitle(slide, title);
+  addKeyMessageBar(slide, keyMessage);
+
+  var centerX = 5.0;
+  var centerY = 3.4;
+  var hubR = 0.75;
+  var spokeRadius = 1.95;
+  var boxW = 1.55;
+  var boxH = 0.62;
+  var spokes = data.spokes;
+  var count = spokes.length;
+
+  // 接続線（ハブの前に描く）
+  for (var i = 0; i < count; i++) {
+    var angle = (2 * Math.PI * i / count) - Math.PI / 2;
+    var ex = centerX + spokeRadius * Math.cos(angle);
+    var ey = centerY + spokeRadius * Math.sin(angle);
+    var sx = centerX + hubR * Math.cos(angle);
+    var sy = centerY + hubR * Math.sin(angle);
+    slide.addShape("line", {
+      x: sx, y: sy, w: ex - sx, h: ey - sy,
+      line: { color: COLORS.CREAM_YELLOW, width: 2 }
+    });
+  }
+
+  // ハブ（中心円）
+  slide.addShape("ellipse", {
+    x: centerX - hubR, y: centerY - hubR, w: hubR * 2, h: hubR * 2,
+    fill: { color: COLORS.DARK_GREEN }
+  });
+  slide.addText(data.hub, {
+    x: centerX - hubR, y: centerY - hubR, w: hubR * 2, h: hubR * 2,
+    fontSize: FONT.S, fontFace: FACE, color: COLORS.WHITE,
+    bold: true, align: "center", valign: "middle"
+  });
+
+  // スポーク
+  for (var i = 0; i < count; i++) {
+    var angle = (2 * Math.PI * i / count) - Math.PI / 2;
+    var bx = centerX + spokeRadius * Math.cos(angle) - boxW / 2;
+    var by = centerY + spokeRadius * Math.sin(angle) - boxH / 2;
+
+    slide.addShape("rect", {
+      x: bx, y: by, w: boxW, h: boxH,
+      fill: { color: COLORS.LIGHT_GRAY },
+      rectRadius: 0.08
+    });
+    // 左アクセントライン
+    slide.addShape("rect", {
+      x: bx, y: by, w: 0.05, h: boxH,
+      fill: { color: COLORS.DARK_GREEN },
+      rectRadius: 0.04
+    });
+    slide.addText(spokes[i].label, {
+      x: bx + 0.1, y: by, w: boxW - 0.1, h: spokes[i].description ? boxH * 0.5 : boxH,
+      fontSize: FONT.XS, fontFace: FACE, color: COLORS.TEXT_DARK,
+      bold: true, align: "center", valign: "middle"
+    });
+    if (spokes[i].description) {
+      slide.addText(spokes[i].description, {
+        x: bx + 0.1, y: by + boxH * 0.5, w: boxW - 0.1, h: boxH * 0.5,
+        fontSize: 10, fontFace: FACE, color: COLORS.TEXT_MEDIUM,
+        align: "center", valign: "middle"
+      });
+    }
+  }
+
+  addSource(slide, source);
+  return slide;
+}
+
+// =============================================================================
+// パターン 24: ベン図
+// =============================================================================
+
+function addVennSlide(pres, title, keyMessage, data, source) {
+  // data: { left: { label, items[] }, right: { label, items[] }, overlap: { label, items[] } }
+  var slide = pres.addSlide();
+  addSlideTitle(slide, title);
+  addKeyMessageBar(slide, keyMessage);
+
+  var cy = 3.3;
+  var rW = 3.8;
+  var rH = 3.0;
+  var overlapX = 0.9;  // 重なり幅
+  var leftCX = 3.2;
+  var rightCX = leftCX + rW - overlapX;
+
+  // 左円（グリーン半透過）
+  slide.addShape("ellipse", {
+    x: leftCX - rW / 2, y: cy - rH / 2, w: rW, h: rH,
+    fill: { color: COLORS.DARK_GREEN, transparency: 45 },
+    line: { color: COLORS.DARK_GREEN, width: 2 }
+  });
+
+  // 右円（クリームイエロー半透過）
+  slide.addShape("ellipse", {
+    x: rightCX - rW / 2, y: cy - rH / 2, w: rW, h: rH,
+    fill: { color: COLORS.CREAM_YELLOW, transparency: 45 },
+    line: { color: COLORS.CREAM_YELLOW, width: 2 }
+  });
+
+  // 左ラベル
+  slide.addText(data.left.label, {
+    x: leftCX - rW / 2 + 0.15, y: cy - 0.6, w: rW / 2 - 0.1, h: 0.45,
+    fontSize: FONT.S, fontFace: FACE, color: COLORS.TEXT_DARK,
+    bold: true, align: "center", valign: "middle"
+  });
+  if (data.left.items && data.left.items.length > 0) {
+    slide.addText(data.left.items.join("\n"), {
+      x: leftCX - rW / 2 + 0.15, y: cy - 0.1, w: rW / 2 - 0.1, h: 1.2,
+      fontSize: FONT.XS, fontFace: FACE, color: COLORS.TEXT_MEDIUM,
+      align: "center", valign: "top"
+    });
+  }
+
+  // 重なりラベル
+  var overlapCX = (leftCX + rightCX) / 2;
+  if (data.overlap) {
+    slide.addText(data.overlap.label, {
+      x: overlapCX - 0.6, y: cy - 0.6, w: 1.2, h: 0.45,
+      fontSize: FONT.XS, fontFace: FACE, color: COLORS.TEXT_DARK,
+      bold: true, align: "center", valign: "middle"
+    });
+    if (data.overlap.items && data.overlap.items.length > 0) {
+      slide.addText(data.overlap.items.join("\n"), {
+        x: overlapCX - 0.65, y: cy - 0.1, w: 1.3, h: 1.2,
+        fontSize: 10, fontFace: FACE, color: COLORS.TEXT_DARK,
+        align: "center", valign: "top"
+      });
+    }
+  }
+
+  // 右ラベル
+  slide.addText(data.right.label, {
+    x: rightCX + 0.1, y: cy - 0.6, w: rW / 2 - 0.1, h: 0.45,
+    fontSize: FONT.S, fontFace: FACE, color: COLORS.TEXT_DARK,
+    bold: true, align: "center", valign: "middle"
+  });
+  if (data.right.items && data.right.items.length > 0) {
+    slide.addText(data.right.items.join("\n"), {
+      x: rightCX + 0.1, y: cy - 0.1, w: rW / 2 - 0.1, h: 1.2,
+      fontSize: FONT.XS, fontFace: FACE, color: COLORS.TEXT_MEDIUM,
+      align: "center", valign: "top"
+    });
+  }
+
+  addSource(slide, source);
+  return slide;
+}
+
+// =============================================================================
+// パターン 25: ピラミッド
+// =============================================================================
+
+function addPyramidSlide(pres, title, keyMessage, levels, source) {
+  // levels: [{ label: "...", description: "..." }] — index 0 が頂点（最重要）
+  var slide = pres.addSlide();
+  addSlideTitle(slide, title);
+  addKeyMessageBar(slide, keyMessage);
+
+  var count = levels.length;
+  var totalH = 3.2;
+  var layerH = (totalH - 0.08 * (count - 1)) / count;
+  var startY = 1.55;
+  var maxW = 8.0;
+  var centerX = 5.0;
+  // 頂点が濃く（DARK_GREEN系）、下に行くほど薄くなる
+  var fills = ["007A6E", "00A495", "33B6A9", "66C9C0", "99DBDA"];
+  var textColors = [COLORS.WHITE, COLORS.WHITE, COLORS.WHITE, COLORS.TEXT_DARK, COLORS.TEXT_DARK];
+
+  for (var i = 0; i < count; i++) {
+    var w = maxW * (i + 1) / count;
+    var x = centerX - w / 2;
+    var y = startY + i * (layerH + 0.08);
+    var fill = fills[Math.min(i, fills.length - 1)];
+    var textColor = textColors[Math.min(i, textColors.length - 1)];
+
+    slide.addShape("rect", {
+      x: x, y: y, w: w, h: layerH,
+      fill: { color: fill },
+      rectRadius: 0.04
+    });
+    slide.addText(levels[i].label, {
+      x: x + 0.1, y: y, w: w * 0.32, h: layerH,
+      fontSize: FONT.S, fontFace: FACE, color: i < 2 ? COLORS.CREAM_YELLOW : COLORS.DARK_GREEN,
+      bold: true, valign: "middle"
+    });
+    if (levels[i].description) {
+      slide.addText(levels[i].description, {
+        x: x + w * 0.32 + 0.1, y: y, w: w * 0.64, h: layerH,
+        fontSize: FONT.S, fontFace: FACE, color: textColor,
+        valign: "middle"
+      });
+    }
+  }
+
+  addSource(slide, source);
+  return slide;
+}
+
+// =============================================================================
+// パターン 26: スイムレーン
+// =============================================================================
+
+function addSwimlaneSlide(pres, title, keyMessage, data, source) {
+  // data: { phases: ["Phase1", ...], lanes: [{ label: "担当者", nodes: ["ノード名", ...] }] }
+  var slide = pres.addSlide();
+  addSlideTitle(slide, title);
+  addKeyMessageBar(slide, keyMessage);
+
+  var startX = 0.6;
+  var startY = 1.55;
+  var labelW = 1.1;
+  var totalW = 8.8;
+  var contentW = totalW - labelW;
+  var phases = data.phases;
+  var lanes = data.lanes;
+  var phaseCount = phases.length;
+  var laneCount = lanes.length;
+  var phaseW = contentW / phaseCount;
+  var laneH = 3.2 / laneCount;
+  var headerH = 0.4;
+
+  // フェーズヘッダー（上段）
+  slide.addShape("rect", {
+    x: startX, y: startY, w: labelW, h: headerH,
+    fill: { color: COLORS.DARK_GREEN }
+  });
+  for (var p = 0; p < phaseCount; p++) {
+    var phaseX = startX + labelW + p * phaseW;
+    slide.addShape("rect", {
+      x: phaseX, y: startY, w: phaseW, h: headerH,
+      fill: { color: COLORS.DARK_GREEN }
+    });
+    slide.addText(phases[p], {
+      x: phaseX, y: startY, w: phaseW, h: headerH,
+      fontSize: FONT.XS, fontFace: FACE, color: COLORS.WHITE,
+      bold: true, align: "center", valign: "middle",
+      border: { pt: 0.5, color: COLORS.WHITE }
+    });
+  }
+
+  // レーン
+  for (var l = 0; l < laneCount; l++) {
+    var laneY = startY + headerH + l * laneH;
+    var laneBg = l % 2 === 0 ? COLORS.LIGHT_GRAY : COLORS.WHITE;
+
+    // レーンラベル
+    slide.addShape("rect", {
+      x: startX, y: laneY, w: labelW, h: laneH,
+      fill: { color: COLORS.DARK_GREEN }
+    });
+    slide.addShape("rect", {
+      x: startX, y: laneY, w: 0.05, h: laneH,
+      fill: { color: COLORS.CREAM_YELLOW }
+    });
+    slide.addText(lanes[l].label, {
+      x: startX + 0.05, y: laneY, w: labelW - 0.05, h: laneH,
+      fontSize: FONT.XS, fontFace: FACE, color: COLORS.WHITE,
+      bold: true, align: "center", valign: "middle"
+    });
+
+    // セル背景
+    for (var p = 0; p < phaseCount; p++) {
+      slide.addShape("rect", {
+        x: startX + labelW + p * phaseW, y: laneY, w: phaseW, h: laneH,
+        fill: { color: laneBg },
+        line: { color: "D9D9D9", width: 0.5 }
+      });
+    }
+
+    // ノードカード
+    var nodes = lanes[l].nodes;
+    for (var n = 0; n < nodes.length && n < phaseCount; n++) {
+      if (!nodes[n]) continue;
+      var cardX = startX + labelW + n * phaseW + 0.12;
+      var cardW = phaseW - 0.24;
+      var cardH = laneH - 0.24;
+      var cardY = laneY + 0.12;
+      slide.addShape("rect", {
+        x: cardX, y: cardY, w: cardW, h: cardH,
+        fill: { color: COLORS.CREAM_YELLOW },
+        rectRadius: 0.06
+      });
+      slide.addText(nodes[n], {
+        x: cardX, y: cardY, w: cardW, h: cardH,
+        fontSize: 10, fontFace: FACE, color: COLORS.DARK_GREEN,
+        bold: true, align: "center", valign: "middle"
+      });
+      // フェーズ間矢印
+      if (n < phaseCount - 1 && nodes[n + 1]) {
+        slide.addText("▶", {
+          x: startX + labelW + (n + 1) * phaseW - 0.22, y: laneY, w: 0.22, h: laneH,
+          fontSize: 9, fontFace: FACE, color: COLORS.DARK_GREEN,
+          align: "center", valign: "middle"
+        });
+      }
+    }
+  }
+
+  addSource(slide, source);
+  return slide;
+}
+
+// =============================================================================
+// パターン 27: 同心円
+// =============================================================================
+
+function addConcentricSlide(pres, title, keyMessage, rings, source) {
+  // rings: [{ label: "...", description: "..." }] — index 0 が最外円
+  var slide = pres.addSlide();
+  addSlideTitle(slide, title);
+  addKeyMessageBar(slide, keyMessage);
+
+  var cx = 3.4;
+  var cy = 3.35;
+  var maxRW = 3.4;
+  var maxRH = 2.6;
+  var count = rings.length;
+  // 外→内で薄→濃
+  var fills = ["D6F0EE", "99DBDA", "33B6A9", "00A495", "007A6E"];
+
+  for (var i = 0; i < count; i++) {
+    var rW = maxRW * (count - i) / count;
+    var rH = maxRH * (count - i) / count;
+    slide.addShape("ellipse", {
+      x: cx - rW / 2, y: cy - rH / 2, w: rW, h: rH,
+      fill: { color: fills[Math.min(i, fills.length - 1)] }
+    });
+  }
+
+  // 凡例（右側）
+  var legendX = cx + maxRW / 2 + 0.5;
+  var legendW = 9.4 - legendX;
+  var legendStartY = 1.65;
+  var itemH = 3.2 / count;
+
+  for (var i = 0; i < count; i++) {
+    var ly = legendStartY + i * itemH;
+    var dotColor = fills[Math.min(i, fills.length - 1)];
+    var dotBorder = i <= 1 ? COLORS.DARK_GREEN : "";
+
+    slide.addShape("ellipse", {
+      x: legendX, y: ly + itemH / 2 - 0.1, w: 0.2, h: 0.2,
+      fill: { color: dotColor },
+      line: dotBorder ? { color: COLORS.DARK_GREEN, width: 0.5 } : undefined
+    });
+    slide.addText(rings[i].label, {
+      x: legendX + 0.3, y: ly, w: legendW - 0.3, h: itemH * 0.48,
+      fontSize: FONT.S, fontFace: FACE, color: COLORS.TEXT_DARK,
+      bold: true, valign: "middle"
+    });
+    if (rings[i].description) {
+      slide.addText(rings[i].description, {
+        x: legendX + 0.3, y: ly + itemH * 0.48, w: legendW - 0.3, h: itemH * 0.48,
+        fontSize: FONT.XS, fontFace: FACE, color: COLORS.TEXT_MEDIUM,
+        valign: "middle"
+      });
+    }
+  }
+
+  addSource(slide, source);
+  return slide;
+}
+
+// =============================================================================
+// パターン 28: 組織図
+// =============================================================================
+
+function addOrgChartSlide(pres, title, keyMessage, orgData, source) {
+  // orgData: { root: { label, sublabel }, children: [{ label, sublabel, children: [{ label, sublabel }] }] }
+  var slide = pres.addSlide();
+  addSlideTitle(slide, title);
+  addKeyMessageBar(slide, keyMessage);
+
+  var nodeW = 2.0;
+  var nodeH = 0.6;
+  var cx = 5.0;
+  var rootY = 1.6;
+  var vGap = 0.65;
+  var children = orgData.children || [];
+  var childCount = children.length;
+  var childY = rootY + nodeH + vGap;
+  var totalW = 8.8;
+  var childSpacing = totalW / Math.max(childCount, 1);
+
+  function drawNode(label, sublabel, nx, ny, isRoot) {
+    var bg = isRoot ? COLORS.DARK_GREEN : COLORS.LIGHT_GRAY;
+    var txtColor = isRoot ? COLORS.WHITE : COLORS.TEXT_DARK;
+    var subColor = isRoot ? COLORS.CREAM_YELLOW : COLORS.TEXT_MEDIUM;
+    slide.addShape("rect", {
+      x: nx - nodeW / 2, y: ny, w: nodeW, h: nodeH,
+      fill: { color: bg }, rectRadius: 0.08
+    });
+    slide.addShape("rect", {
+      x: nx - nodeW / 2, y: ny, w: 0.06, h: nodeH,
+      fill: { color: isRoot ? COLORS.CREAM_YELLOW : COLORS.DARK_GREEN }
+    });
+    slide.addText(label, {
+      x: nx - nodeW / 2 + 0.12, y: ny, w: nodeW - 0.12, h: sublabel ? nodeH * 0.55 : nodeH,
+      fontSize: FONT.XS, fontFace: FACE, color: txtColor,
+      bold: true, valign: "middle"
+    });
+    if (sublabel) {
+      slide.addText(sublabel, {
+        x: nx - nodeW / 2 + 0.12, y: ny + nodeH * 0.55, w: nodeW - 0.12, h: nodeH * 0.45,
+        fontSize: 10, fontFace: FACE, color: subColor, valign: "middle"
+      });
+    }
+  }
+
+  // ルートノード
+  drawNode(orgData.root.label, orgData.root.sublabel, cx, rootY, true);
+
+  for (var i = 0; i < childCount; i++) {
+    var childCX = 0.6 + childSpacing * i + childSpacing / 2;
+    // 縦線（ルート→分岐点）
+    slide.addShape("line", {
+      x: cx, y: rootY + nodeH,
+      w: 0, h: vGap / 2,
+      line: { color: COLORS.CREAM_YELLOW, width: 1.5 }
+    });
+    // 横線（分岐点→子）
+    var branchY = rootY + nodeH + vGap / 2;
+    slide.addShape("line", {
+      x: Math.min(cx, childCX), y: branchY,
+      w: Math.abs(childCX - cx), h: 0,
+      line: { color: COLORS.CREAM_YELLOW, width: 1.5 }
+    });
+    // 縦線（分岐点→子ノード）
+    slide.addShape("line", {
+      x: childCX, y: branchY,
+      w: 0, h: vGap / 2,
+      line: { color: COLORS.CREAM_YELLOW, width: 1.5 }
+    });
+    drawNode(children[i].label, children[i].sublabel, childCX, childY, false);
+
+    // 孫ノード
+    var grandchildren = children[i].children || [];
+    var gcCount = grandchildren.length;
+    if (gcCount > 0) {
+      var gcY = childY + nodeH + vGap * 0.75;
+      var gcSpacing = childSpacing / Math.max(gcCount, 1);
+      for (var j = 0; j < gcCount; j++) {
+        var gcX = (childCX - childSpacing / 2) + gcSpacing * j + gcSpacing / 2;
+        var gcBranchY = childY + nodeH + vGap * 0.75 / 2;
+        slide.addShape("line", {
+          x: childCX, y: childY + nodeH,
+          w: 0, h: vGap * 0.75 / 2,
+          line: { color: "CCCCCC", width: 1 }
+        });
+        slide.addShape("line", {
+          x: Math.min(childCX, gcX), y: gcBranchY,
+          w: Math.abs(gcX - childCX), h: 0,
+          line: { color: "CCCCCC", width: 1 }
+        });
+        slide.addShape("line", {
+          x: gcX, y: gcBranchY,
+          w: 0, h: vGap * 0.75 / 2,
+          line: { color: "CCCCCC", width: 1 }
+        });
+        drawNode(grandchildren[j].label, grandchildren[j].sublabel, gcX, gcY, false);
+      }
+    }
+  }
+
+  addSource(slide, source);
+  return slide;
+}
+
+// =============================================================================
+// パターン 29: PDCA
+// =============================================================================
+
+function addPdcaSlide(pres, title, keyMessage, pdcaData, source) {
+  // pdcaData: { plan: { title, description }, do: { title, description }, check: { title, description }, action: { title, description } }
+  var slide = pres.addSlide();
+  addSlideTitle(slide, title);
+  addKeyMessageBar(slide, keyMessage);
+
+  var startX = 0.6;
+  var startY = 1.55;
+  var totalW = 8.8;
+  var totalH = 3.6;
+  var gap = 0.14;
+  var halfW = (totalW - gap) / 2;
+  var halfH = (totalH - gap) / 2;
+
+  var quadrants = [
+    { key: "plan",   label: "PLAN",   x: startX,              y: startY,              bg: COLORS.DARK_GREEN,  txt: COLORS.WHITE,     acc: COLORS.CREAM_YELLOW },
+    { key: "do",     label: "DO",     x: startX + halfW + gap, y: startY,              bg: COLORS.CREAM_YELLOW, txt: COLORS.DARK_GREEN, acc: COLORS.DARK_GREEN },
+    { key: "check",  label: "CHECK",  x: startX,              y: startY + halfH + gap, bg: COLORS.LIGHT_GRAY,  txt: COLORS.TEXT_DARK, acc: COLORS.DARK_GREEN },
+    { key: "action", label: "ACTION", x: startX + halfW + gap, y: startY + halfH + gap, bg: COLORS.DARK_GREEN,  txt: COLORS.WHITE,     acc: COLORS.CREAM_YELLOW }
+  ];
+
+  for (var i = 0; i < quadrants.length; i++) {
+    var q = quadrants[i];
+    var d = pdcaData[q.key] || {};
+
+    slide.addShape("rect", {
+      x: q.x, y: q.y, w: halfW, h: halfH,
+      fill: { color: q.bg }, rectRadius: 0.08
+    });
+    slide.addShape("rect", {
+      x: q.x, y: q.y, w: 0.06, h: halfH,
+      fill: { color: q.acc }
+    });
+    slide.addText(q.label, {
+      x: q.x + 0.14, y: q.y + 0.12, w: halfW - 0.2, h: 0.38,
+      fontSize: FONT.SP, fontFace: FACE,
+      color: q.bg === COLORS.CREAM_YELLOW ? COLORS.DARK_GREEN : COLORS.CREAM_YELLOW,
+      bold: true, valign: "middle"
+    });
+    if (d.title) {
+      slide.addText(d.title, {
+        x: q.x + 0.14, y: q.y + 0.55, w: halfW - 0.2, h: 0.38,
+        fontSize: FONT.S, fontFace: FACE, color: q.txt,
+        bold: true, valign: "middle"
+      });
+    }
+    if (d.description) {
+      slide.addText(d.description, {
+        x: q.x + 0.14, y: q.y + 0.98, w: halfW - 0.2, h: halfH - 1.1,
+        fontSize: 11, fontFace: FACE, color: q.txt, valign: "top"
+      });
+    }
+  }
+
+  // 中央の循環矢印
+  var midX = startX + halfW + gap / 2 - 0.28;
+  var midY = startY + halfH + gap / 2 - 0.28;
+  slide.addShape("ellipse", {
+    x: midX, y: midY, w: 0.56, h: 0.56,
+    fill: { color: COLORS.WHITE }
+  });
+  slide.addText("↻", {
+    x: midX, y: midY, w: 0.56, h: 0.56,
+    fontSize: FONT.SP, fontFace: FACE, color: COLORS.DARK_GREEN,
+    bold: true, align: "center", valign: "middle"
+  });
+
+  addSource(slide, source);
+  return slide;
+}
+
+// =============================================================================
+// パターン 30: エージェントフロー
+// =============================================================================
+
+function addAgentFlowSlide(pres, title, keyMessage, data, source) {
+  // data: { inputs: ["入力1", ...], center: { label, sublabel }, outputs: ["出力1", ...] }
+  var slide = pres.addSlide();
+  addSlideTitle(slide, title);
+  addKeyMessageBar(slide, keyMessage);
+
+  var centerX = 5.0;
+  var centerW = 2.4;
+  var centerH = 0.85;
+  var centerY = 3.25;
+  var nodeW = 1.55;
+  var nodeH = 0.52;
+  var inputs = data.inputs;
+  var outputs = data.outputs;
+  var inputCount = inputs.length;
+  var outputCount = outputs.length;
+  var inputSpacing = 8.8 / inputCount;
+  var outputSpacing = 8.8 / outputCount;
+
+  // 入力ノード（上段）
+  for (var i = 0; i < inputCount; i++) {
+    var ix = 0.6 + inputSpacing * i + inputSpacing / 2 - nodeW / 2;
+    var iy = 1.65;
+    var iCX = ix + nodeW / 2;
+
+    slide.addShape("rect", {
+      x: ix, y: iy, w: nodeW, h: nodeH,
+      fill: { color: COLORS.LIGHT_GRAY }, rectRadius: 0.08
+    });
+    slide.addShape("rect", {
+      x: ix, y: iy, w: 0.05, h: nodeH,
+      fill: { color: COLORS.DARK_GREEN }
+    });
+    slide.addText(inputs[i], {
+      x: ix + 0.1, y: iy, w: nodeW - 0.1, h: nodeH,
+      fontSize: FONT.XS, fontFace: FACE, color: COLORS.TEXT_DARK,
+      bold: true, align: "center", valign: "middle"
+    });
+
+    // 入力→中心の線
+    slide.addShape("line", {
+      x: iCX, y: iy + nodeH,
+      w: centerX - iCX, h: centerY - iy - nodeH,
+      line: { color: COLORS.CREAM_YELLOW, width: 1.5 }
+    });
+    slide.addText("▼", {
+      x: centerX - 0.13, y: centerY - 0.3, w: 0.26, h: 0.3,
+      fontSize: 9, fontFace: FACE, color: COLORS.CREAM_YELLOW,
+      align: "center", valign: "middle"
+    });
+  }
+
+  // 中心エージェントノード
+  slide.addShape("rect", {
+    x: centerX - centerW / 2, y: centerY - centerH / 2,
+    w: centerW, h: centerH,
+    fill: { color: COLORS.DARK_GREEN }, rectRadius: 0.1
+  });
+  slide.addShape("rect", {
+    x: centerX - centerW / 2, y: centerY - centerH / 2, w: 0.08, h: centerH,
+    fill: { color: COLORS.CREAM_YELLOW }
+  });
+  slide.addText(data.center.label, {
+    x: centerX - centerW / 2 + 0.18, y: centerY - centerH / 2,
+    w: centerW - 0.18, h: data.center.sublabel ? centerH * 0.55 : centerH,
+    fontSize: FONT.S, fontFace: FACE, color: COLORS.WHITE,
+    bold: true, align: "center", valign: "middle"
+  });
+  if (data.center.sublabel) {
+    slide.addText(data.center.sublabel, {
+      x: centerX - centerW / 2 + 0.18, y: centerY - centerH / 2 + centerH * 0.55,
+      w: centerW - 0.18, h: centerH * 0.45,
+      fontSize: 10, fontFace: FACE, color: COLORS.CREAM_YELLOW,
+      align: "center", valign: "middle"
+    });
+  }
+
+  // 出力ノード（下段）
+  for (var j = 0; j < outputCount; j++) {
+    var ox = 0.6 + outputSpacing * j + outputSpacing / 2 - nodeW / 2;
+    var oy = 4.6;
+    var oCX = ox + nodeW / 2;
+
+    // 中心→出力の線
+    slide.addShape("line", {
+      x: centerX, y: centerY + centerH / 2,
+      w: oCX - centerX, h: oy - centerY - centerH / 2,
+      line: { color: COLORS.CREAM_YELLOW, width: 1.5 }
+    });
+    slide.addText("▼", {
+      x: oCX - 0.13, y: oy - 0.28, w: 0.26, h: 0.28,
+      fontSize: 9, fontFace: FACE, color: COLORS.CREAM_YELLOW,
+      align: "center", valign: "middle"
+    });
+
+    slide.addShape("rect", {
+      x: ox, y: oy, w: nodeW, h: nodeH,
+      fill: { color: COLORS.CREAM_YELLOW }, rectRadius: 0.08
+    });
+    slide.addText(outputs[j], {
+      x: ox, y: oy, w: nodeW, h: nodeH,
+      fontSize: FONT.XS, fontFace: FACE, color: COLORS.DARK_GREEN,
+      bold: true, align: "center", valign: "middle"
+    });
+  }
+
+  addSource(slide, source);
+  return slide;
+}
+
+// =============================================================================
 // エクスポート
 // =============================================================================
 
@@ -1493,5 +2160,14 @@ module.exports = {
   addAscendingSlide: addAscendingSlide,
   addFlowTableSlide: addFlowTableSlide,
   addFlowMatrixSlide: addFlowMatrixSlide,
-  addMatrixTableSlide: addMatrixTableSlide
+  addMatrixTableSlide: addMatrixTableSlide,
+  // パターン 23-30（図解追加）
+  addHubSpokeSlide: addHubSpokeSlide,
+  addVennSlide: addVennSlide,
+  addPyramidSlide: addPyramidSlide,
+  addSwimlaneSlide: addSwimlaneSlide,
+  addConcentricSlide: addConcentricSlide,
+  addOrgChartSlide: addOrgChartSlide,
+  addPdcaSlide: addPdcaSlide,
+  addAgentFlowSlide: addAgentFlowSlide
 };

@@ -211,7 +211,7 @@ git push -u origin <現在のブランチ名>
 
 （`<OWNER>/<REPO>` は `git remote get-url origin` で確認できます。「Download raw file」ボタンでダウンロード可能）
 
-## 利用可能な22パターン
+## 利用可能な30パターン
 
 | # | 関数名 | 用途 |
 |---|--------|------|
@@ -238,6 +238,14 @@ git push -u origin <現在のブランチ名>
 | 20 | `addFlowTableSlide(pres, title, keyMsg, ftData, source)` | フロー表型 |
 | 21 | `addFlowMatrixSlide(pres, title, keyMsg, fmData, source)` | フローマトリックス型 |
 | 22 | `addMatrixTableSlide(pres, title, keyMsg, mtData, source)` | マトリックス型 |
+| 23 | `addHubSpokeSlide(pres, title, keyMsg, data, source)` | ハブ＆スポーク |
+| 24 | `addVennSlide(pres, title, keyMsg, data, source)` | ベン図 |
+| 25 | `addPyramidSlide(pres, title, keyMsg, levels[], source)` | ピラミッド |
+| 26 | `addSwimlaneSlide(pres, title, keyMsg, data, source)` | スイムレーン |
+| 27 | `addConcentricSlide(pres, title, keyMsg, rings[], source)` | 同心円 |
+| 28 | `addOrgChartSlide(pres, title, keyMsg, orgData, source)` | 組織図 |
+| 29 | `addPdcaSlide(pres, title, keyMsg, pdcaData, source)` | PDCA |
+| 30 | `addAgentFlowSlide(pres, title, keyMsg, data, source)` | エージェントフロー |
 
 ## 各パターンのデータ構造（必須リファレンス）
 

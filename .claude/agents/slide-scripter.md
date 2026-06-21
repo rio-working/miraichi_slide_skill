@@ -177,6 +177,104 @@ t.addMatrixTableSlide(pres, title, keyMsg, data, source);
 // data: { colLabels: ["Col1", ...], rows: [{ label, cells: ["..."] }] }
 ```
 
+### Pattern 23: Hub-Spoke
+```javascript
+t.addHubSpokeSlide(pres, title, keyMsg, data, source);
+// data: { hub: "中心テキスト", spokes: [{ label: "...", description: "..." }] }
+// spokes: 3〜6個推奨
+```
+
+### Pattern 24: Venn
+```javascript
+t.addVennSlide(pres, title, keyMsg, data, source);
+// data: {
+//   left:    { label: "...", items: ["..."] },
+//   right:   { label: "...", items: ["..."] },
+//   overlap: { label: "...", items: ["..."] }  // 共通エリア
+// }
+```
+
+### Pattern 25: Pyramid
+```javascript
+t.addPyramidSlide(pres, title, keyMsg, levels, source);
+// levels: [{ label: "...", description: "..." }]
+// index 0 が頂点（最重要）→ 下に行くほど幅が広がる
+// 3〜5段推奨
+```
+
+### Pattern 26: Swimlane
+```javascript
+t.addSwimlaneSlide(pres, title, keyMsg, data, source);
+// data: {
+//   phases: ["フェーズ1", "フェーズ2", ...],   // 列ヘッダー（2〜4個）
+//   lanes:  [{ label: "担当者名", nodes: ["ノード1", "ノード2", ...] }]
+//           // lanes の nodes は phases と同数。空欄は "" で渡す
+// }
+```
+
+### Pattern 27: Concentric
+```javascript
+t.addConcentricSlide(pres, title, keyMsg, rings, source);
+// rings: [{ label: "...", description: "..." }]
+// index 0 が最外円 → index が大きいほど内側
+// 3〜5段推奨
+```
+
+### Pattern 28: Org Chart
+```javascript
+t.addOrgChartSlide(pres, title, keyMsg, orgData, source);
+// orgData: {
+//   root: { label: "...", sublabel: "..." },
+//   children: [
+//     { label: "...", sublabel: "...", children: [{ label: "...", sublabel: "..." }] }
+//   ]
+// }
+// 最大3階層。孫ノードは children[i].children に配列で渡す
+```
+
+### Pattern 29: PDCA
+```javascript
+t.addPdcaSlide(pres, title, keyMsg, pdcaData, source);
+// pdcaData: {
+//   plan:   { title: "...", description: "..." },
+//   do:     { title: "...", description: "..." },
+//   check:  { title: "...", description: "..." },
+//   action: { title: "...", description: "..." }
+// }
+```
+
+### Pattern 30: Agent Flow
+```javascript
+t.addAgentFlowSlide(pres, title, keyMsg, data, source);
+// data: {
+//   inputs:  ["入力1", "入力2", ...],          // 上段ノード（2〜4個）
+//   center:  { label: "...", sublabel: "..." }, // 中心エージェント
+//   outputs: ["出力1", "出力2", ...]            // 下段ノード（2〜4個）
+// }
+```
+
+## Phase 2.5: HTML出力（output_format が "html" または "all" の場合）
+
+PPTXの代わりにHTMLスライドを生成する場合は `.claude/references/html-export.md` に従う。
+
+手順:
+1. slide-architect の slide plan を読み込む
+2. 各スライドを `<section class="slide">` に変換
+3. カラーはmiraichi_slide_skillのパレット（グリーン×アンバー）に統一
+4. `output/<タイトル>_YYYYMMDD.html` に保存
+5. `open` で即座に開く
+
+HTML出力の場合は Node.js スクリプト不要。Claudeが直接HTMLを組み立てる。
+
+## Phase 2.6: Google Slides出力（output_format が "gslides" または "all" の場合）
+
+PPTXを先に生成してからGoogle Driveにアップロードする。`.claude/references/gslides-export.md` に従う。
+
+手順:
+1. Phase 2 で PPTX を生成（通常通り）
+2. ユーザーに変換方法を確認（手動アップロード推奨）
+3. Google DriveにアップロードしてSlides形式で開く
+
 ## Phase 3: Execution
 
 ```bash

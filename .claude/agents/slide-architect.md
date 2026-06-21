@@ -33,7 +33,7 @@ Designs the slide deck structure using the トヨマネ式 7-step methodology. M
 ### Step 7: サマリーで結論を再提示
 - Final slide restates the conclusion with next steps
 
-## Available 22 Slide Patterns
+## Available 30 Slide Patterns
 
 | # | Function | Best Use Case |
 |---|----------|---------------|
@@ -60,6 +60,14 @@ Designs the slide deck structure using the トヨマネ式 7-step methodology. M
 | 20 | addFlowTableSlide | Phase × category matrix with flow arrows |
 | 21 | addFlowMatrixSlide | Column flow × row categories |
 | 22 | addMatrixTableSlide | Row × column label matrix |
+| 23 | addHubSpokeSlide | Hub-and-spoke: one center concept → multiple elements |
+| 24 | addVennSlide | Venn diagram: two overlapping concepts |
+| 25 | addPyramidSlide | Pyramid: priority/hierarchy layers (top = most important) |
+| 26 | addSwimlaneSlide | Swimlane: multi-stakeholder process flow by role |
+| 27 | addConcentricSlide | Concentric circles: TAM/SAM/SOM or nested hierarchy |
+| 28 | addOrgChartSlide | Organization chart (up to 3 levels) |
+| 29 | addPdcaSlide | PDCA quad: Plan / Do / Check / Action |
+| 30 | addAgentFlowSlide | AI agent flow: inputs → orchestrator → outputs |
 
 ## Pattern Selection Rules
 - ALWAYS start with Pattern 1 (Title) and Pattern 2 (Summary)
@@ -74,6 +82,14 @@ Designs the slide deck structure using the トヨマネ式 7-step methodology. M
   - Lists → Pattern 5 or 17
   - Strategy/expansion → Pattern 18 or 19
   - Multi-dimensional analysis → Pattern 13, 20, 21, or 22
+  - Center-to-many relationships → Pattern 23 (Hub-Spoke)
+  - Two overlapping concepts → Pattern 24 (Venn)
+  - Priority/maturity hierarchy → Pattern 25 (Pyramid)
+  - Multi-role process → Pattern 26 (Swimlane)
+  - Nested market/scope → Pattern 27 (Concentric)
+  - Team/company structure → Pattern 28 (Org Chart)
+  - Improvement cycle → Pattern 29 (PDCA)
+  - AI/system architecture → Pattern 30 (Agent Flow)
 - Vary patterns for visual interest (avoid 3+ consecutive same-type slides)
 - Each section should have 2-4 body slides
 
