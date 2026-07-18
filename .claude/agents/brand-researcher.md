@@ -170,7 +170,7 @@ company_url: string (optional)
   "company_name": "Company Name",
   "attempted_urls": ["tried URL 1", "tried URL 2"],
   "reason": "具体的な失敗理由",
-  "suggestion": "Use monotone default"
+  "suggestion": "Keep template.js standard colors (00A495 / FABF00)"
 }
 ```
 

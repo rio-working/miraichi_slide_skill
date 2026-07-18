@@ -6,7 +6,7 @@
 ## Inputs
 - `company_name`: 会社名またはブランド名（任意）
 - `company_url`: 会社の公式サイトURL（任意）
-- `style_preference`: スタイル指定（任意、デフォルト: "monotone"）
+- `style_preference`: スタイル指定（任意、デフォルト: "standard" = template.js の標準カラーのまま。"monotone" は明示指定時のみ）
 - `color_hints`: ユーザーが言及した具体的な色（任意）
 
 ## 実行ロジック
@@ -22,8 +22,12 @@ ELIF color_hints が指定されている:
   → リサーチをスキップ
   → ユーザー指定色を template-generator に渡す
 
+ELIF style_preference が "monotone":
+  → モノトーンパレットを template-generator に渡す
+
 ELSE:
-  → モノトーンデフォルトを template-generator に渡す
+  → template.js の標準カラー（グリーン 00A495 × アンバー FABF00）のまま変更しない
+  → template-generator の実行自体をスキップしてよい
 ```
 
 ### 実行順序
@@ -52,8 +56,8 @@ brand-researcher の結果を受け取ったら、以下を確認する:
 - 更新された template.js のカラー設定
 - ユーザーへのカラーパレット提示と承認
 
-## デフォルトモノトーンパレット
-会社未指定またはリサーチ失敗時:
+## モノトーンパレット
+ユーザーが明示的にモノトーンを指定した場合のみ（会社未指定・リサーチ失敗時は template.js の標準カラーのまま）:
 ```
 PRIMARY:     "1A1A1A"    SECONDARY:   "4A4A4A"
 LIGHT_BG:    "F5F5F5"    TEXT_DARK:    "1A1A1A"

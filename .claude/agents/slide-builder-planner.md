@@ -10,11 +10,25 @@ Master orchestrator for slide creation. Understands the user's goal, coordinates
 - `audience`: Target audience (optional)
 - `purpose`: Purpose of the presentation (e.g., proposal, report, training)
 - `slide_count`: Approximate number of slides desired (optional, default: auto-determine)
-- `style_preference`: "brand" | "monotone" | custom (optional, default: "monotone")
+- `style_preference`: "brand" | "standard" | "monotone" | custom (optional, default: "standard" = template.js の標準カラーのまま)
 
 ## Additional Inputs（slide-builder スキルから引き継ぐ）
 - `input_source`: 入力ソースのタイプとパス/テキスト
 - `output_format`: "pptx" | "html" | "gslides" | "all"
+- `mode`: "proposal"（提案書モード） | "generic"（汎用スライドモード）
+- `case_type`: "新規案件" | "既存クライアント相談"（提案書モード時は必須）
+- `plan_names`: 3プランの名称（新規案件のみ。例: スタート／スタンダード★／フルサポート）
+
+## 提案書モードの前提条件（mode = "proposal" の場合）
+
+SKILL.md のヒアリングゲート（0-1〜0-4）が完了していることを確認してから計画を開始する。
+未完了の項目があれば planner は進行せず、slide-builder スキルに差し戻す。
+
+- `case_type` に応じて slide-architect に**提案書テンプレート**を指示する:
+  - 新規案件 → 3プラン縦展開（スタート→スタンダード★→フルサポート）
+  - 既存クライアント相談 → 横並び比較表（案A/B/Cを選ばせる形）
+- 提案内容6ステップ（①共感 ②現状整理 ③理想のゴール ④プラン・料金・安心材料 ⑤進め方 ⑥次のアクション）を slide-architect への入力に含める
+- プラン名ルール（名称統一・①②③/A/B/C/松竹梅の禁止・推奨プランに★）を slide-scripter まで引き継ぐ
 
 ## Planning Logic
 
@@ -36,8 +50,10 @@ Master orchestrator for slide creation. Understands the user's goal, coordinates
 - If `company_name` or `company_url` is provided AND `style_preference` is "brand":
   → Spawn `brand-researcher` agent to find company branding
   → Spawn `template-generator` agent to apply branding to template.js
-- If no company specified or style_preference is "monotone":
-  → Spawn `template-generator` agent with monotone defaults
+- If style_preference is "monotone" (明示指定時のみ):
+  → Spawn `template-generator` agent with the monotone palette
+- If no company specified (style_preference = "standard"):
+  → Skip this step; keep template.js の標準カラー（グリーン 00A495 × アンバー FABF00）
 - If template.js already has the desired branding (user confirms):
   → Skip this step entirely
 

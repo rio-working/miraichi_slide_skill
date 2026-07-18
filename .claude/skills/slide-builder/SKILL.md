@@ -1,12 +1,55 @@
 ---
 name: slide-builder
-description: PowerPointスライドを自動生成する。「スライド作成」「プレゼン作成」「資料作成」「スライド作って」「プレゼン作って」「slide」「presentation」「PowerPoint」などで発動。
+description: クライアント向け提案書・プレゼンスライドを高品質30パターンで自動生成する（Miraichiスライド）。HTML→Vercel公開でURL共有可。Use when user mentions: スライド作って, スライド作成, 提案書, プレゼン作成, クライアント提案, 資料作って（スライド形式）. Do NOT load for: TechWorker社内・TW営業資料（→tw-docs）, セミナー投影・オフライン配布の単一HTML（→slide-html-builder）, PPTXテンプレート指定の汎用生成（→slide-generator）, 草案MDからのデザインシステム適用（→slide-design-guide）.
 ---
 
 # Skill: slide-builder
 
 ## Description
 Detects requests to create slide decks. Routes to the slide-builder-planner agent. Supports flexible input sources and multiple output formats.
+
+## Step 0: モード判定（最初に必ず実行）
+
+リクエストに「提案書」「クライアント提案」「提案資料」「提案したい」が含まれる場合 → **提案書モード**
+それ以外 → **汎用スライドモード**（Step 1 へ進む）
+
+### 提案書モード — ヒアリングゲート（スキップ禁止）
+
+スライドを作る前にヒアリングが完了しているか確認する。未完了なら `clarify-client-request` スキルへ誘導。
+
+**0-1. 案件タイプの確認**
+> 「新規案件ですか？それとも既存クライアントからの相談（改善・効率化依頼）ですか？」
+
+| タイプ | スライド構成 |
+|---|---|
+| 新規案件 | 3プラン縦展開（スタート→スタンダード★→フルサポート） |
+| 既存クライアント相談 | 横並び比較表（案A/B/Cを選ばせる形） |
+
+**0-2. 提案内容の6ステップ確認**
+
+| ステップ | 確認内容 |
+|---|---|
+| ①お悩みへの共感 | 相手の困りごとを言語化できているか |
+| ②今の状況の整理 | 現状を「そうそう」と思えるレベルで整理できているか |
+| ③理想のゴール | ヒアリングで確認したゴールを「こう理解しました」の形で書けるか（AIで補完しない） |
+| ④プランと料金と安心材料 | 料金・不安フォローがセットで準備できているか |
+| ⑤進め方 | スケジュール・役割分担があるか |
+| ⑥次のアクション | クライアントが明日取る1アクションが決まっているか |
+
+**0-3. アクセントカラーの確認**（デフォルト: Miraichiグリーン×アンバー）
+> 「クライアントのブランドカラーに合わせますか？（会社名またはURLを教えてください）」
+
+**0-4. プラン名の確認（新規案件のみ）**
+> 「3つのプランの名前を教えてください。（例：スタートプラン／スタンダードプラン／フルサポートプラン）」
+
+**プラン名ルール（違反したら指摘する）:**
+- 最初に決めた名前をスライド全体で統一する
+- 番号（①②③）・アルファベット（A/B/C）・松竹梅での表記禁止
+- 推奨プランには「★」または「（推奨）」を付ける
+
+0-1〜0-4 が揃ったら slide-architect の **提案書テンプレート** を使って構成し、Step 3 へ進む。
+
+---
 
 ## Step 1: 入力ソースを確認する
 
@@ -55,3 +98,36 @@ User Request → [入力ソース取り込み] → [AskUserQuestion] → slide-b
 - All planning and execution happen in agents.
 - HTML出力の詳細: `.claude/references/html-export.md`
 - Google Slides出力の詳細: `.claude/references/gslides-export.md`
+
+## 提案書モード — 完了後フロー
+
+### URL発行（クライアントへ共有する場合）
+
+HTML形式で出力した場合、`html-pages` リポジトリ経由でVercel公開する：
+
+```bash
+cp <生成したHTMLファイル> ~/html-pages/
+cd ~/html-pages
+git add <ファイル名>.html
+git commit -m "feat: add slide <案件名>"
+git push
+```
+
+公開URL形式: `https://html-pages-rosy.vercel.app/<ファイル名>.html`（約30秒で公開）
+
+### ペルソナ評価（クライアントへ送る前に推奨）
+
+```
+/persona-review
+[提案書の概要をここに記述]
+※ CTOペルソナは「費用を判断する経営者（依頼主と同一の場合もある）」として読み替えること
+```
+
+---
+
+## 企画書作成の標準フロー（クライアント向け提案）
+
+1. **商談当日** → Miraichiスライド（PPTX or HTML slide形式）でプレゼン
+2. **商談後即日** → 縦長HTML（スクロール形式）を送付（稟議回し・後日確認用）
+
+**セクション扉（Pattern 3）は各テーマ間に必須**：クライアントが頭を切り替えるための余白スライド。省略不可。

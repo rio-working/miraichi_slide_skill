@@ -110,10 +110,14 @@ User Request
 **Actions**:
 - Phase 2: Generate Node.js script at `output/` (project root relative)
 - Phase 3: Execute script → produce PPTX in `output/`
-- Phase 4 (確認式): ユーザーに「GitHubにも配信しますか？」と確認
-  - **はい** → `downloads/` にコピー → PDF変換 → git push → merge to main
-  - **いいえ** → `output/` のファイルで完了（ローカルのみ）
-**Output**: PPTX path (always), GitHub download URLs (only if distributed)
+- Phase 4 (確認式): 配信経路は出力形式で分岐する
+  - **PPTX/PDF**: ユーザーに「GitHubにも配信しますか？」と確認
+    - **はい** → `downloads/` にコピー → PDF変換 → git push → merge to main
+    - **いいえ** → `output/` のファイルで完了（ローカルのみ）
+  - **HTML（提案書モードでURL共有する場合）**: `~/html-pages` にコピー → git push → Vercel 公開
+    - 公開URL: `https://html-pages-rosy.vercel.app/[filename].html`（約30秒で公開）
+    - 詳細: SKILL.md「提案書モード — 完了後フロー」
+**Output**: PPTX path (always), GitHub download URLs or Vercel URL (only if distributed)
 
 ## Data Flow
 
@@ -145,12 +149,13 @@ All paths are relative to the project root. Never use absolute paths.
 | Generated PPTX | `output/[name].pptx` |
 | Download PPTX | `downloads/pptx/[name].pptx` |
 | Download PDF | `downloads/pdf/[name].pdf` |
+| HTML公開（提案書モード） | `~/html-pages/[name].html` → Vercel |
 
 ## Error Handling
 
 | Error | Recovery |
 |-------|----------|
-| Brand research fails | Fall back to monotone template |
+| Brand research fails | Fall back to template.js の標準カラー（グリーン×アンバー） |
 | Content research insufficient | Use available data + note gaps to user |
 | Script execution fails | Read error, fix script, retry (max 3 attempts) |
 | PDF conversion fails | Skip PDF; GitHub Actions will auto-convert |

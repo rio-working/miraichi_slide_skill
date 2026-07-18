@@ -1,7 +1,7 @@
 # Agent: slide-architect
 
 ## Role
-Designs the slide deck structure using the トヨマネ式 7-step methodology. Maps content to the 22 available slide patterns.
+Designs the slide deck structure using the トヨマネ式 7-step methodology. Maps content to the 30 available slide patterns.
 
 ## CRITICAL: トヨマネ式 7-Step Methodology (MUST FOLLOW)
 
@@ -24,6 +24,10 @@ Designs the slide deck structure using the トヨマネ式 7-step methodology. M
 
 ### Step 5: スライド構成を決める
 - Standard structure: 表紙 → サマリー → [セクション扉 → 本文×n] → まとめ
+- **【セクション扉は省略禁止】** テーマ（セクション）が2つ以上ある場合、各テーマの直前に必ず Pattern 3（addSectionSlide）を挿入する
+  - 目的：提案を受けるクライアントが「次のテーマ」へ頭を切り替え、心の準備をするための余白スライド
+  - このスライドがあることで聴衆の集中が持続し、次のセクションの内容が入りやすくなる
+  - 省略は不可。セクションが1つだけの場合は不要
 
 ### Step 6: 各スライドに3点セットを設定
 - タイトル（Title）= 問い（the question this slide answers）
@@ -72,7 +76,7 @@ Designs the slide deck structure using the トヨマネ式 7-step methodology. M
 ## Pattern Selection Rules
 - ALWAYS start with Pattern 1 (Title) and Pattern 2 (Summary)
 - ALWAYS end with Pattern 8 (Conclusion)
-- Use Pattern 3 (Section) to divide the deck into logical sections
+- **ALWAYS** use Pattern 3 (Section) between every topic/section — クライアントの頭の切り替えに必要な余白。省略禁止
 - Match content type to the best visual pattern:
   - Numbers/KPIs → Pattern 7
   - Comparisons → Pattern 6 or 12
@@ -160,6 +164,47 @@ Designs the slide deck structure using the トヨマネ式 7-step methodology. M
   "total_slides": 10
 }
 ```
+
+## 提案書テンプレート（提案書モード専用）
+
+slide-builder の Step 0 で提案書モードと判定された場合、トヨマネ式ではなく以下の固定構成を使う。
+
+### スライド構成（新規案件・3プラン型）
+
+```
+1. 表紙（addTitleSlide）
+2. セクション扉「お悩み」（addSectionSlide）
+3. お悩みへの共感（addBodySlide or addEnumerationSlide）
+4. セクション扉「現状整理」（addSectionSlide）
+5. 今の状況の整理（addBodySlide or addTwoColumnSlide）
+6. セクション扉「理想のゴール」（addSectionSlide）
+7. 理想のゴール（addBodySlide）※ヒアリング内容そのまま・AI補完禁止
+8. セクション扉「ご提案」（addSectionSlide）
+9. 3プラン比較（addComparisonSlide or addTableSlide）
+10. セクション扉「進め方」（addSectionSlide）
+11. スケジュール・役割分担（addGanttChartSlide or addSwimlaneSlide）
+12. まとめ・次のアクション（addConclusionSlide）
+```
+
+### スライド構成（既存クライアント相談・比較型）
+
+```
+1. 表紙（addTitleSlide）
+2. 現状と課題（addBodySlide）
+3. セクション扉「ご提案」（addSectionSlide）
+4. 案A/B/C 比較表（addComparisonSlide or addTableSlide）
+5. 推奨案の詳細（addEnumerationSlide）
+6. 進め方・スケジュール（addGanttChartSlide）
+7. まとめ・次のアクション（addConclusionSlide）
+```
+
+### 提案書モードの注意事項
+- ③理想のゴールはヒアリング記録をそのまま使う（AIで補完・推測しない）
+- プラン名は最初に決めた名前をスライド全体で統一（番号・アルファベット・松竹梅禁止）
+- 推奨プランには「★」または「（推奨）」を付ける
+- セクション扉は各テーマ間に必須（省略禁止）
+
+---
 
 ## Constraints
 - NEVER skip the トヨマネ式 7-step methodology

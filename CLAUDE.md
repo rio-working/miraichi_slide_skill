@@ -5,7 +5,7 @@
 このリポジトリは、ビジネスユーザーがClaude Codeに指示するだけでPowerPointスライドを自動生成するスキルです。
 GitHubからクローンして、Claude Codeで即座に使えるように設計されています。
 
-- **テンプレートライブラリ**: `scripts/template.js`（全22パターンのスライド生成関数）
+- **テンプレートライブラリ**: `scripts/template.js`（全30パターンのスライド生成関数）
 - **企業プリセット**: `scripts/presets/`（企業ごとのカラー・フォント定義）
 - **参照資料**: `references/`（企業IR資料等のPDF、gitignored）
 - **出力先**: `output/` ディレクトリ（プロジェクトルート直下、gitignored）
@@ -45,7 +45,7 @@ cp .env.example .env
 ### Phase 0: デザインリサーチ（会社名・URLがある場合）
 
 ユーザーが会社名やURLを指定した場合、スライド設計の前にブランドリサーチを行い、`scripts/template.js` のカラー設定を更新します。
-会社名・URLの指定がない場合はモノトーンデフォルトのままスキップしてください。
+会社名・URLの指定がない場合は標準カラー（`template.js` のデフォルト値: グリーン `00A495` × アンバー `FABF00`）のままスキップしてください。モノトーンはユーザーが明示的に指定した場合のみ適用します。
 
 #### Step 0: プリセット確認（最優先）
 
@@ -63,6 +63,8 @@ if (preset) {
 
 プリセットが見つかった場合は以下の調査手順をスキップし、そのまま Phase 1 に進む。
 プリセットがない場合のみ、以下の WebSearch による調査を行う。
+
+> **注意（期待値）**: 現在プリセットは `docomo.js` の1社のみ。プリセットがない企業は WebSearch ベースの推測調査（confidence low/medium 許容）となるため、色再現の精度は保証されない。頻出クライアントは調査結果をプリセット（`scripts/presets/`）として保存し、次回以降の安定性を高めること。
 
 #### 調査手順（プリセットがない場合、段階的に深掘りする）
 
@@ -90,9 +92,9 @@ if (preset) {
 
 更新したカラーパレットを evidence（出典URL）付きでユーザーに提示し、承認を得る。
 - 却下された場合: ユーザーの希望色を聞いて再反映
-- リサーチでブランドカラーが見つからなかった場合: モノトーンデフォルトで続行
+- リサーチでブランドカラーが見つからなかった場合: 標準カラー（`template.js` のデフォルト値）で続行
 
-#### モノトーンデフォルト（リサーチ不要時 / リサーチ失敗時）
+#### モノトーンパレット（ユーザーが明示的にモノトーンを指定した場合のみ）
 
 ```
 PRIMARY:     "1A1A1A"    SECONDARY:   "4A4A4A"
@@ -249,171 +251,12 @@ git push -u origin <現在のブランチ名>
 
 ## 各パターンのデータ構造（必須リファレンス）
 
-スライド生成時は、必ず以下のデータ構造に従ってください。プロパティ名を間違えるとスライドが空欄になります。
-
-### パターン 5: 列挙型
-
-```javascript
-t.addEnumerationSlide(pres, "タイトル", "キーメッセージ", [
-  { title: "項目名", description: "説明文" },  // ※ desc ではなく description
-  { title: "項目名", description: "説明文" }
-], "出所");
-```
-
-### パターン 6: 2カラム比較
-
-```javascript
-// col1, col2 は別引数。1つのオブジェクトにまとめない
-t.addTwoColumnSlide(pres, "タイトル", "キーメッセージ",
-  { title: "左タイトル", points: ["項目1", "項目2"] },  // ※ items ではなく points
-  { title: "右タイトル", points: ["項目1", "項目2"] },  // ※ items ではなく points
-  "出所"
-);
-```
-
-### パターン 7: 統計数値
-
-```javascript
-t.addStatsSlide(pres, "タイトル", "キーメッセージ", [
-  { value: "150%", label: "ラベル", description: "補足説明" }
-], "出所");
-```
-
-### パターン 10: グラフ
-
-```javascript
-t.addChartSlide(pres, "BAR", [  // "BAR", "LINE", "PIE", "DOUGHNUT"
-  { name: "系列名", labels: ["Q1","Q2"], values: [100, 200] }
-], {
-  title: "タイトル",
-  keyMessage: "キーメッセージ",
-  explanation: { title: "説明タイトル", text: "説明文" },
-  source: "出所"
-});
-```
-
-### パターン 11: フロー（横型）
-
-```javascript
-t.addFlowChartSlide(pres, "タイトル", "キーメッセージ", [
-  { text: "ステップ名", description: "説明文" }  // ※ title ではなく text
-], "出所");
-```
-
-### パターン 11b: フロー（縦型）
-
-```javascript
-t.addVerticalFlowSlide(pres, "タイトル", "キーメッセージ", [
-  { text: "ステップ名", description: "説明文" }  // ※ title ではなく text
-], "出所");
-```
-
-### パターン 12: 比較対照
-
-```javascript
-t.addComparisonSlide(pres, "タイトル", "キーメッセージ", {
-  col1: { title: "左タイトル", points: ["項目1", "項目2"] },
-  col2: { title: "右タイトル", points: ["項目1", "項目2"] }
-}, "出所");
-```
-
-### パターン 13: 4象限マトリックス
-
-```javascript
-t.addMatrix4QuadrantSlide(pres, "タイトル", "キーメッセージ", {
-  axisLabels: { xHigh: "右", xLow: "左", yHigh: "上", yLow: "下" },
-  quadrants: [
-    { label: "左上", description: "説明" },
-    { label: "右上", description: "説明" },
-    { label: "左下", description: "説明" },
-    { label: "右下", description: "説明" }
-  ],
-  points: [{ label: "点名", x: 60, y: 70 }]
-}, "出所");
-```
-
-### パターン 14: サイクル図
-
-```javascript
-t.addCycleDiagramSlide(pres, "タイトル", "キーメッセージ", [
-  { text: "ステップ1" }, { text: "ステップ2" }
-], "出所");
-```
-
-### パターン 15: ガントチャート
-
-```javascript
-t.addGanttChartSlide(pres, "タイトル", "キーメッセージ", {
-  headers: ["タスク", "1月", "2月", "3月"],
-  rows: [{ task: "タスク名", start: 1, end: 2 }]
-}, "出所");
-```
-
-### パターン 16: テーブル
-
-```javascript
-t.addTableSlide(pres, "タイトル", "キーメッセージ", {
-  headers: ["列1", "列2", "列3"],
-  rows: [["値1", "値2", "値3"]]
-}, "出所");
-```
-
-### パターン 17: 背景型
-
-```javascript
-t.addBackgroundSlide(pres, "タイトル", "キーメッセージ", {
-  category: "カテゴリ名",
-  items: [{ label: "項目名", description: "説明" }]
-}, "出所");
-```
-
-### パターン 18: 拡散型
-
-```javascript
-t.addDivergenceSlide(pres, "タイトル", "キーメッセージ", {
-  source: "中心ラベル",
-  targets: [{ label: "展開先", description: "説明" }]
-}, "出所");
-```
-
-### パターン 19: 上昇型
-
-```javascript
-t.addAscendingSlide(pres, "タイトル", "キーメッセージ", [
-  { label: "ステップ名", description: "説明" }
-], "出所");
-```
-
-### パターン 20: フロー表型
-
-```javascript
-t.addFlowTableSlide(pres, "タイトル", "キーメッセージ", {
-  phases: ["フェーズ1", "フェーズ2"],
-  categories: [{ label: "行ラベル", cells: ["値1", "値2"] }]
-}, "出所");
-```
-
-### パターン 21: フローマトリックス型
-
-```javascript
-t.addFlowMatrixSlide(pres, "タイトル", "キーメッセージ", {
-  columns: ["列1", "列2"],
-  rows: [{ label: "行ラベル", cells: ["値1", "値2"] }]
-}, "出所");
-```
-
-### パターン 22: マトリックス型
-
-```javascript
-t.addMatrixTableSlide(pres, "タイトル", "キーメッセージ", {
-  colLabels: ["列1", "列2"],
-  rows: [{ label: "行ラベル", cells: ["値1", "値2"] }]
-}, "出所");
-```
+各パターンの引数・プロパティ名の詳細は `.claude/agents/pattern-reference.md` を参照。
+プロパティ名を間違えるとスライドが空欄になるため、使用前に必ず確認すること。
 
 ## デザインルール
 
-- **カラー**: デフォルトはモノトーン。会社名・URLが指定された場合は Phase 0 で自動リサーチ → `scripts/template.js` のカラー値を更新
+- **カラー**: デフォルトは標準カラー（グリーン `00A495` × アンバー `FABF00`、`template.js` のデフォルト値）。会社名・URLが指定された場合は Phase 0 で自動リサーチ → `scripts/template.js` のカラー値を更新。モノトーンは明示指定時のみ
 - **フォント**: Noto Sans JP
 - **最小フォントサイズ**: 16pt（出所表記12ptは例外）
 - **レイアウト**: 16:9、左右マージン0.6in

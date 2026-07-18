@@ -260,7 +260,7 @@ PPTXの代わりにHTMLスライドを生成する場合は `.claude/references/
 手順:
 1. slide-architect の slide plan を読み込む
 2. 各スライドを `<section class="slide">` に変換
-3. カラーはmiraichi_slide_skillのパレット（グリーン×アンバー）に統一
+3. カラーは `scripts/template.js` の `COLORS` の**現在値**を読み取ってCSS変数に反映する（ブランドリサーチ/プリセット適用後の色をそのまま使う。グリーン×アンバーは template.js 未変更時のデフォルトにすぎない）
 4. `output/<タイトル>_YYYYMMDD.html` に保存
 5. `open` で即座に開く
 
@@ -335,6 +335,25 @@ BRANCH=$(git branch --show-current)
 # PPTX: ${REMOTE_URL}/blob/${BRANCH}/downloads/pptx/[filename].pptx
 # PDF:  ${REMOTE_URL}/blob/${BRANCH}/downloads/pdf/[filename].pdf
 ```
+
+### 提案書モード × HTML出力の場合（配信経路が異なる）
+
+上記の downloads/ → GitHub 経路は **PPTX配信用**。提案書モードでHTML出力した場合は、
+`html-pages` リポジトリ経由の Vercel 公開を使う（SKILL.md「提案書モード — 完了後フロー」参照）:
+
+```bash
+cp output/[filename].html ~/html-pages/
+cd ~/html-pages
+git add [filename].html
+git commit -m "feat: add slide [案件名]"
+git push
+# 公開URL: https://html-pages-rosy.vercel.app/[filename].html（約30秒で公開）
+```
+
+| 出力 | 配信経路 |
+|---|---|
+| PPTX / PDF | downloads/ → git push → GitHub Actions通知 |
+| HTML（提案書モード・URL共有） | ~/html-pages → Vercel 公開 |
 
 ## Output
 - Generated PPTX file path (always)

@@ -70,9 +70,15 @@ function apply(preset, template) {
     });
   }
   if (preset.chartColors && template.CHART_COLORS) {
-    template.CHART_COLORS = preset.chartColors;
+    // in-place置換: template.js内部のモジュールスコープ変数と同一配列を維持する
+    template.CHART_COLORS.length = 0;
+    preset.chartColors.forEach(function (c) {
+      template.CHART_COLORS.push(c);
+    });
   }
-  if (preset.font && template.FACE !== undefined) {
+  if (preset.font) {
+    // setFace経由でtemplate.js内部のFACE変数を差し替える（exports側の代入では反映されない）
+    if (template.setFace) template.setFace(preset.font);
     template.FACE = preset.font;
   }
 }

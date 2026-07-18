@@ -33,6 +33,11 @@ var FONT = {
 
 var FACE = "Noto Sans JP";
 
+// プリセット適用用: モジュール内部の FACE を差し替える（presets/index.js から呼ばれる）
+function setFace(name) {
+  FACE = name;
+}
+
 var config = {
   layout: "LAYOUT_16x9",
   marginLR: 0.6,
@@ -2135,6 +2140,7 @@ module.exports = {
   COLORS: COLORS,
   FONT: FONT,
   FACE: FACE,
+  setFace: setFace,
   CHART_COLORS: CHART_COLORS,
   // パターン 1-9
   addTitleSlide: addTitleSlide,

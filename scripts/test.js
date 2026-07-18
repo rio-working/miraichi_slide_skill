@@ -11,12 +11,12 @@ pres.author = "テスト";
 pres.title = "全パターンテスト";
 
 // パターン 1: 表紙
-t.addTitleSlide(pres, "Sincerely Slide Skill V2", "全22パターン動作テスト", "テスト作成者");
+t.addTitleSlide(pres, "Sincerely Slide Skill V2", "全30パターン動作テスト", "テスト作成者");
 
 // パターン 2: サマリー
-t.addSummarySlide(pres, "全22パターンが正常に動作することを確認", [
+t.addSummarySlide(pres, "全30パターンが正常に動作することを確認", [
   "基本パターン（1-9）の動作確認",
-  "V2追加パターン（10-22）の動作確認",
+  "V2追加パターン（10-30）の動作確認",
   "デザインシステムの一貫性を検証"
 ]);
 
