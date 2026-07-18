@@ -1,6 +1,6 @@
 ---
 name: slide-builder
-description: クライアント向け提案書・プレゼンスライドを高品質30パターンで自動生成する（Miraichiスライド）。HTML→Vercel公開でURL共有可。Use when user mentions: スライド作って, スライド作成, 提案書, プレゼン作成, クライアント提案, 資料作って（スライド形式）. Do NOT load for: TechWorker社内・TW営業資料（→tw-docs）, セミナー投影・オフライン配布の単一HTML（→slide-html-builder）, PPTXテンプレート指定の汎用生成（→slide-generator）, 草案MDからのデザインシステム適用（→slide-design-guide）.
+description: クライアント向け提案書・プレゼンスライドを高品質30パターンで自動生成する（Miraichiスライド、エンジンはslide-masterと同一）。HTML→Vercel公開でURL共有可。このフォルダ内で作業中はこのスキルが直接使えるが、通常はグローバルの `slide-master` スキル（同一エンジン・全用途対応の統合入口）を使うこと。Use when user mentions: スライド作って, スライド作成, 提案書, プレゼン作成, クライアント提案, 資料作って（スライド形式）. Do NOT load for: TechWorker社内・TW営業資料（→tw-docs）, セミナー投影・オフライン配布の単一HTML（→slide-html-builder）, 草案MDからのデザインシステム適用（→slide-design-guide）.
 ---
 
 # Skill: slide-builder
